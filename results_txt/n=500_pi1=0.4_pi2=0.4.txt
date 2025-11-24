@@ -1,0 +1,63 @@
+n=500_pi1=0.4_pi2=0.4
+
+1. GENERATING SYNTHETIC DATA
+------------------------------
+DataSets/X_train_0k_inflated_(500, 2)_(0.40,0.40).csv
+DataSets/X_test_0k_inflated_(500, 2)_(0.40,0.40).csv
+DataSets/y_train (500, 2)_(0.40,0.40).csv
+DataSets/y_test (500, 2)_(0.40,0.40).csv
+Data shape: (500, 2)
+------------------------------
+ZKIPModel_EM_(500, 2_(0.40,0.40))
+------------------------------
+Iteration 0: Log-likelihood = -inf
+Converged after 23 iterations
+Performance metrics:
+  Expected value prediction:
+    MSE: 3.7956
+    MAE: 1.5894
+    r^2: 0.1553
+  Mode prediction:
+    MSE: 5.5700
+    MAE: 5.5700
+    r^2: -0.2395
+    Accuracy: 0.4800
+------------------------------
+ZkICMP_(500, 2_(0.40,0.40))
+------------------------------
+Performance metrics:
+  Rate predictions (λ):
+    MSE: 4.0467
+    MAE: 1.6476
+    r^2: 0.0995
+  Count predictions:
+    MSE: 5.9600
+    MAE: 1.6600
+    r^2: -0.3263
+    Accuracy: 0.4400
+------------------------------
+HistGradientBoostingRegressor_(500, 2_(0.40,0.40))
+------------------------------
+Performance metrics:
+  Rate predictions (λ):
+    MSE: 4.1353
+    MAE: 1.6693
+    R²: 0.0797
+  Count predictions (rounded):
+    MSE: 3.9600
+    MAE: 1.6200
+    R²: 0.1187
+    Accuracy: 0.0753
+------------------------------
+PoissonRandomForestRegressor_(500, 2)_(0.40,0.40)
+------------------------------
+Performance metrics:
+  Rate predictions (λ):
+    MSE: 4.0429
+    MAE: 1.6506
+    R²: 0.1003
+  Count predictions (rounded):
+    MSE: 4.1000
+    MAE: 1.6800
+    R²: 0.0876
+    Accuracy: 0.0600
