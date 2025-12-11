@@ -30,6 +30,9 @@ def generate_ZI(n, k, beta0, beta1, gamma0, gamma1, alpha0, alpha1, r, cov_type=
             y[i] = k
         else:
             # Generate from standard NB (no truncation)
-            y[i] = nbinom.rvs(r, r / (r + mu[i]))
+            y[i] = nbinom.rvs(r, r / (r + mu[i])) #What r Controls:
+            # r → ∞: Variance = μ (converges to Poisson)
+            # r → 0: Variance → ∞ (highly overdispersed)
+            # typical values: r between 0.1 and 10 for count data
                     
     return pd.DataFrame({"y": y, "x": x})
