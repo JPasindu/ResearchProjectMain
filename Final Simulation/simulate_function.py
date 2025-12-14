@@ -36,17 +36,29 @@ def simulation_plan(
                 r=r,
                 cov_type=cov_type
             )
-            
+
+            p_0 = df['y'].value_counts().get(0, 0) / len(df)
+            p_k = df['y'].value_counts().get(k, 0) / len(df)
+            p_p = max(1 - p_0 - p_k, 0)
+            y_mean = df['y'].mean()
+            y_std = df['y'].std()
+
             results.append({
                 "data": df,
                 "params": {
-                    "rep": rep,
-                    "n": n, "k": k,
+                    #"rep": rep,
+                    #"n": n, "k": k,
                     "beta0": beta0, "beta1": beta1,
                     "gamma0": gamma0, "gamma1": gamma1,
                     "alpha0": alpha0, "alpha1": alpha1,
-                    "r": r,
-                    "cov_type": cov_type
+                    #"r": r,
+                    #"cov_type": cov_type
+                    'n_unique': len(df['y'].value_counts()), 
+                    'p_0': p_0,
+                    'p_k': p_k,
+                    'p_p': p_p,
+                    'y_mean': y_mean,
+                    'y_std': y_std
                 }
             })
 

@@ -1,0 +1,19 @@
+1. set train and test indexes
+2. Generate a dataset
+2. Get 0_proportion(p0), k_proportion(pk), other values proportion and unique_value count <--- **
+3. train and test split
+4. y_mean, y_std, R_2_hat, p0_nb, pk_nb(use train only)
+5. R_2_hat<0 (keep all the values as null -> break the process)
+6. fit models
+    1. stat models
+    output:- log-likelihood(training only)
+          :- AIC/BIC(training only)
+          :- MSE/MAE/R^2(testing and training(to check the overfitting))
+          :- accuraces of 3 classes(0, k, other counts)
+    2. ML models
+    output:- MSE/MAE/R^2(testing and training(to check the overfitting))
+          :- accuraces of 3 classes(0, k, other counts)
+
+
+
+

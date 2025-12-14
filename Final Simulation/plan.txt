@@ -1,0 +1,67 @@
+Simulation plan
+
+* no sampling 0s or ks
+1. data sets-> 
+    n=300, B(replications)=200
+    beta1=(-2, 2, 9)-> [-2. , -1.5, -1. , -0.5,  0. ,  0.5,  1. ,  1.5,  2. ]
+    gamma1=(-2, 2, 9)-> [-2. , -1.5, -1. , -0.5,  0. ,  0.5,  1. ,  1.5,  2. ]
+    alpha1=(-2, 2, 9)-> [-2. , -1.5, -1. , -0.5,  0. ,  0.5,  1. ,  1.5,  2. ]
+    9*9*9**200=145,800 datasets
+2. r=1
+3. k=2
+4. one covariate (nymerical)/ x = np.random.normal(0, 1, n)
+
+output:
+1.      "data":      df,
+        "params": {
+                    "beta0": beta0, "beta1": beta1,
+                    "gamma0": gamma0, "gamma1": gamma1,
+                    "alpha0": alpha0, "alpha1": alpha1,
+                    'n_unique': len(df['y'].value_counts()), 
+                    'p_0': p_0,
+                    'p_k': p_k,
+                    'p_p': p_p,
+                    'y_mean': y_mean,
+                    'y_std': y_std
+                }
+
+2.  calculate r_hat-estimated r value
+    calculate expected 0 proportion based on y_mean, r_hat
+    calculate expected k proportion based on y_mean, r_hat
+
+from scipy.stats import nbinom
+
+r_hat=abg_df['y_mean']**2 / (abg_df['y_std']**2 - abg_df['y_mean'])
+abg_df['r_hat']=r_hat
+
+abg_df['p0_nb'] = nbinom.pmf(0, abg_df['r_hat'], abg_df['r_hat']/(abg_df['r_hat'] + abg_df['y_mean']))
+abg_df['pk_nb'] = nbinom.pmf(k, abg_df['r_hat'], abg_df['r_hat']/(abg_df['r_hat'] + abg_df['y_mean']))
+
+** using p0_nb and pk_nb we can find whether 0 and k inflated or not
+
+3. if r_hat<0 drop that column 
+nb won't work when r_hat<0 (unederdispertion)
+
+4. model fitting:-
+Models to fit
+1. Poisson 
+2. NB
+3. ZIP
+4. ZINB
+5. ZkIP
+6. ZkINB
+7. ZkICMP
+8. HurdlePoisson
+9. HurdleNB
+10. HistGradientBoostingRegressor with Poisson loss
+11. RandomForestRegressor with Poisson loss
+
+
+return:-
+y_test
+y_test_pred
+MSE
+MAE
+R^2
+
+
