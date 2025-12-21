@@ -2,6 +2,8 @@ import numpy as np
 from scipy.special import expit, gammaln
 from numpy.linalg import solve
 
+# problem with alpha
+
 # -------------------------------------------------------------
 # IRLS for Negative Binomial regression (NB2)
 # -------------------------------------------------------------
@@ -85,11 +87,14 @@ def ZINB_EM(y, B, G, alpha, max_iter=100, tol=1e-5):
         if (np.max(np.abs(beta_new - beta)) < tol and
             np.max(np.abs(gamma_new - gamma)) < tol):
             beta, gamma = beta_new, gamma_new
+            final_ll=final_loglik(y, B, G, beta, gamma, alpha)
+
             break
 
         beta, gamma = beta_new, gamma_new
 
-    return beta, gamma
+
+    return beta, gamma, final_ll
 
 
 # -------------------------------------------------------------
@@ -131,3 +136,74 @@ def predict_pmf(k, B_new, G_new, beta, gamma, alpha):
             + r * np.log(prob) + k * np.log(1 - prob)
         )
         return (1 - p) * np.exp(nb_pmf)
+
+
+def final_loglik(y, B, G, beta, gamma, alpha):
+    """
+    Compute the final log-likelihood of the ZINB model.
+    
+    Parameters
+    ----------
+    y : array_like
+        Observed counts (n,)
+    B : array_like
+        Design matrix for NB component (n, p)
+    G : array_like
+        Design matrix for zero-inflation component (n, q)
+    beta : array_like
+        Estimated coefficients for NB component (p,)
+    gamma : array_like
+        Estimated coefficients for zero-inflation component (q,)
+    alpha : float
+        Estimated dispersion parameter
+    
+    Returns
+    -------
+    loglik : float
+        Final log-likelihood value
+    """
+    n = len(y)
+    
+    # Compute NB mean and zero-inflation probability
+    mu = np.exp(B @ beta)
+    p = expit(G @ gamma)
+    
+    # Compute NB part parameters
+    r = 1 / alpha
+    prob = r / (r + mu)
+    
+    # Compute NB zero probabilities
+    nb_zero = prob ** r
+    
+    # Initialize log-likelihood array
+    loglik = np.zeros(n)
+    
+    # Mask for zeros and non-zeros
+    zero_mask = (y == 0)
+    nonzero_mask = ~zero_mask
+    
+    # For zero counts
+    if np.any(zero_mask):
+        zinb_zero = p[zero_mask] + (1 - p[zero_mask]) * nb_zero[zero_mask]
+        zinb_zero = np.clip(zinb_zero, 1e-15, 1 - 1e-15)
+        loglik[zero_mask] = np.log(zinb_zero)
+    
+    # For non-zero counts
+    if np.any(nonzero_mask):
+        y_nz = y[nonzero_mask]
+        prob_nz = prob[nonzero_mask]
+        p_nz = p[nonzero_mask]
+        
+        # NB log-PMF for non-zero counts
+        nb_logpmf = (
+            gammaln(y_nz + r) - gammaln(r) - gammaln(y_nz + 1)
+            + r * np.log(prob_nz) + y_nz * np.log(1 - prob_nz)
+        )
+        
+        # ZINB PMF for non-zero counts
+        zinb_pmf = (1 - p_nz) * np.exp(nb_logpmf)
+        zinb_pmf = np.clip(zinb_pmf, 1e-15, 1 - 1e-15)
+        
+        loglik[nonzero_mask] = np.log(zinb_pmf)
+    
+    return np.sum(loglik)

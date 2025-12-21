@@ -80,11 +80,13 @@ def ZIP_EM(y, B, G, max_iter=100, tol=1e-5):
         if (np.max(np.abs(beta_new - beta)) < tol) and \
            (np.max(np.abs(gamma_new - gamma)) < tol):
             beta, gamma = beta_new, gamma_new
+            final_ll=final_loglik(beta, gamma, B, G, y)
             break
 
+        
         beta, gamma = beta_new, gamma_new
 
-    return beta, gamma
+    return beta, gamma, final_ll
 
 
 # -------------------------------------------------------------
@@ -126,3 +128,42 @@ def predict_pmf(k, B_new, G_new, beta, gamma):
         return p + (1 - p) * np.exp(-lam)
     else:
         return (1 - p) * np.exp(-lam) * (lam**k) / np.exp(gammaln(k + 1))
+
+
+def final_loglik(beta, gamma, B, G, y):
+    """
+    Calculate the log-likelihood for a Zero-Inflated Poisson (ZIP) model.
+    
+    Parameters:
+    -----------
+    beta : array_like
+        Estimated coefficients for the Poisson component
+    gamma : array_like
+        Estimated coefficients for the logistic (zero-inflation) component
+    B : array_like
+        Design matrix for Poisson component (covariates for λ)
+    G : array_like
+        Design matrix for logistic component (covariates for p)
+    y : array_like
+        Observed count responses
+    
+    Returns:
+    --------
+    float
+        Log-likelihood of the ZIP model given the parameters
+    """
+    lambda_i = np.exp(B @ beta)
+    p_i = expit(G @ gamma)
+    
+    # Poisson log-probabilities for all y
+    poisson_log_prob = -lambda_i + y * np.log(lambda_i) - gammaln(y + 1)
+    
+    # Zero-inflated log-likelihood
+    loglik_zero = np.log(p_i + (1 - p_i) * np.exp(-lambda_i))
+    loglik_pos = np.log(1 - p_i) + poisson_log_prob
+    
+    # Combine using masks
+    mask_zero = (y == 0)
+    loglik = np.sum(loglik_zero[mask_zero]) + np.sum(loglik_pos[~mask_zero])
+    
+    return loglik

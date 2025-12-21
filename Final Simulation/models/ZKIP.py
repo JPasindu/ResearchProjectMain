@@ -134,6 +134,7 @@ class ZKIP_EM:
         self.pi3 = 1 / (1 + np.exp(self.gamma) + np.exp(self.delta))
         self.pi1 = np.exp(self.gamma) * self.pi3
         self.pi2 = np.exp(self.delta) * self.pi3
+        self.final_loglik = self._log_likelihood(X, y)
         
         self.is_fitted = True
         return self
@@ -161,8 +162,8 @@ class ZKIP_EM:
             raise ValueError("Model must be fitted first")
         
         # Add intercept if not present
-        if not np.all(X[:, 0] == 1):
-            X = np.column_stack([np.ones(X.shape[0]), X])
+        #if not np.all(X[:, 0] == 1):
+        #    X = np.column_stack([np.ones(X.shape[0]), X])
         
         lambd = np.exp(X @ self.beta)
         n = len(lambd)
@@ -191,8 +192,8 @@ class ZKIP_EM:
             raise ValueError("Model must be fitted first")
         
         # Add intercept if not present
-        if not np.all(X[:, 0] == 1):
-            X = np.column_stack([np.ones(X.shape[0]), X])
+        #if not np.all(X[:, 0] == 1):
+        #    X = np.column_stack([np.ones(X.shape[0]), X])
         
         lambd = np.exp(X @ self.beta)
         return self.k_inflated * self.pi2 + self.pi3 * lambd

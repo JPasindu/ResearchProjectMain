@@ -38,6 +38,5 @@ def generate_hnb(n, k, beta0, beta1, gamma0, gamma1, alpha0, alpha1, r, cov_type
             j += 1
             if y[i] > 0 and y[i] != k:
                 break
-    print(j/n)
                     
     return pd.DataFrame({"y": y, "x": x})

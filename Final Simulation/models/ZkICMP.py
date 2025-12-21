@@ -4,6 +4,7 @@ from scipy.optimize import minimize
 from functools import lru_cache
 import warnings
 
+# no EM algorithm
 class ZkICMP:
     """
     Zero-and-k Inflated Conway-Maxwell-Poisson (ZkICMP) Model
@@ -110,7 +111,6 @@ class ZkICMP:
                 py_cmp = self._cmp_pmf(yi, lam, nu)
                 prob = pi3 * py_cmp
                 ll += np.log(max(prob, 1e-300))
-        
         return -ll
     
     def fit(self, X, y, init=None, method='L-BFGS-B', verbose=False):
@@ -163,7 +163,7 @@ class ZkICMP:
         self.eta_ = res.x[p + 2]
         self.nu_ = np.exp(self.eta_)
         self.fitted_ = True
-        
+        self.final_loglik = self._negloglik(self.params_, X, y)
         return self
     
     def predict(self, X, max_count=50):

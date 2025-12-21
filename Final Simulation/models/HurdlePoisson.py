@@ -2,7 +2,9 @@ import numpy as np
 import statsmodels.api as sm
 from statsmodels.base.model import GenericLikelihoodModel
 from scipy.special import gammaln
-from scipy.special import logsumexp
+
+# problem with ll and the method(no EM?)
+
 # ==============================================================
 # Zero-Truncated Poisson (ZTP) MLE
 # ==============================================================
@@ -47,7 +49,6 @@ class ZeroKInflatedPoisson:
         self.ztp_model = None   # Zero-truncated Poisson for "other"
     
     def fit(self, X, y):
-        X = sm.add_constant(X)
         y = np.array(y)
         
         # Create categories: 0=zero, 1=k, 2=other
@@ -68,18 +69,53 @@ class ZeroKInflatedPoisson:
         return self
     
     def predict_probs(self, X):
-        X = sm.add_constant(X)
         probs = self.infl_model.predict(X)  # Returns matrix [P(0), P(k), P(other)]
-        return probs[:, 0], probs[:, 1], probs[:, 2]
+        return probs.iloc[:, 0], probs.iloc[:, 1], probs.iloc[:, 2]
     
     def predict_mean(self, X):
         p_zero, p_k, p_other = self.predict_probs(X)
-        X = sm.add_constant(X)
         
         if self.ztp_model:
             mu = np.exp(X @ self.ztp_model.params)
-            mean_other = mu / (1 - np.exp(-mu))
+            p0 = np.exp(-mu)
+            pk = np.exp(self.k * np.log(mu) - mu - gammaln(self.k + 1))
+
+            mean_other = (mu - self.k * pk) / (1 - p0 - pk)
+
         else:
             mean_other = 0
         
         return self.k * p_k + mean_other * p_other
+
+    def loglikelihood(self, X, y):
+        probs = self.infl_model.predict(X)
+        p0 = probs.iloc[:, 0].values
+        pk = probs.iloc[:, 1].values
+        po = probs.iloc[:, 2].values
+
+        mu = np.exp(X @ self.ztp_model.params)
+
+        log_p0_pois = -mu
+        log_pk_pois = self.k * np.log(mu) - mu - gammaln(self.k + 1)
+
+        ll = np.zeros_like(y, dtype=float)
+
+        # y = 0
+        mask0 = (y == 0)
+        ll[mask0] = np.log(p0[mask0])
+
+        # y = k
+        maskk = (y == self.k)
+        ll[maskk] = np.log(pk[maskk])
+
+        # y ∉ {0,k}
+        masko = ~(mask0 | maskk)
+        ll[masko] = (
+            np.log(po[masko])
+            + y[masko] * np.log(mu[masko])
+            - mu[masko]
+            - gammaln(y[masko] + 1)
+            - np.log(1 - np.exp(log_p0_pois[masko]) - np.exp(log_pk_pois[masko]))
+        )
+
+        return ll.sum()
