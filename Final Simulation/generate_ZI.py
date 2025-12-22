@@ -12,6 +12,7 @@ def generate_ZI(n, k, beta0, beta1, gamma0, gamma1, alpha0, alpha1, r, cov_type=
         x = bernoulli.rvs(0.5, size=n)
     else:
         x = np.random.normal(0, 1, n)
+        x = (x-np.mean(x))/np.var(x)
     
     # Logistic zero-probabilities
     p0 = expit(beta0 + beta1 * x)

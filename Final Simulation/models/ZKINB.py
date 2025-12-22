@@ -177,8 +177,8 @@ class ZkINB_EM:
             def weighted_multinomial_negloglik(gvec):
                 g0 = gvec[:p_infl]
                 gk = gvec[p_infl:]
-                a = X_infl @ g0
-                b = X_infl @ gk
+                a = np.clip(X_infl @ g0, -20, 20)
+                b = np.clip(X_infl @ gk, -20, 20)
                 S = np.vstack([a, b, np.zeros_like(a)])  # (3, n)
                 lse = logsumexp(S, axis=0)
                 # log probs

@@ -80,11 +80,11 @@ def ZIP_EM(y, B, G, max_iter=100, tol=1e-5):
         if (np.max(np.abs(beta_new - beta)) < tol) and \
            (np.max(np.abs(gamma_new - gamma)) < tol):
             beta, gamma = beta_new, gamma_new
-            final_ll=final_loglik(beta, gamma, B, G, y)
             break
 
-        
         beta, gamma = beta_new, gamma_new
+
+    final_ll=final_loglik(beta, gamma, B, G, y)
 
     return beta, gamma, final_ll
 

@@ -24,7 +24,7 @@ class ZKIP_EM:
     def _e_step(self, y, X, beta, gamma, delta):
         """E-step: Compute expected values of latent variables"""
         n = len(y)
-        lambd = np.exp(X @ beta)
+        lambd = np.exp(X @ beta) #<--------------- RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ beta)
         
         p0 = self._compute_poisson_prob(0, lambd)
         pk = self._compute_poisson_prob(self.k_inflated, lambd)
@@ -71,12 +71,13 @@ class ZKIP_EM:
         
         # Update beta using weighted Poisson regression
         def neg_log_likelihood_beta(beta):
-            lambd = np.exp(X @ beta)
-            return -np.sum(z3_hat * (y * np.log(lambd) - lambd))
+            lambd = np.exp(X @ beta) #<------------------------------------ RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ beta)
+            return -np.sum(z3_hat * (y * np.log(lambd) - lambd)) #<-------- RuntimeWarning: divide by zero encountered in log return -np.sum(z3_hat * (y * np.log(lambd) - lambd))
+
         
         # Initialize beta with current values or zeros
         beta_init = self.beta if hasattr(self, 'beta') else np.zeros(X.shape[1])
-        result = minimize(neg_log_likelihood_beta, beta_init, method='BFGS')
+        result = minimize(neg_log_likelihood_beta, beta_init, method='L-BFGS-B')
         beta_new = result.x
         
         return beta_new, gamma_new, delta_new
@@ -143,8 +144,9 @@ class ZKIP_EM:
         """Compute observed data log-likelihood"""
         if not hasattr(self, 'beta'):
             return -np.inf
-        
-        lambd = np.exp(X @ self.beta)
+
+        lambd = np.exp(X @ self.beta) #<---------------- RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ self.beta)
+
         p0 = self._compute_poisson_prob(0, lambd)
         pk = self._compute_poisson_prob(self.k_inflated, lambd)
         
@@ -152,7 +154,7 @@ class ZKIP_EM:
         ll_0 = np.sum(np.log(self.pi1 + self.pi3 * p0[y == 0]))
         ll_k = np.sum(np.log(self.pi2 + self.pi3 * pk[y == self.k_inflated]))
         ll_other = np.sum(np.log(self.pi3 * self._compute_poisson_prob(y[(y != 0) & (y != self.k_inflated)], 
-                                                                      lambd[(y != 0) & (y != self.k_inflated)])))
+                                                                      lambd[(y != 0) & (y != self.k_inflated)]))) #<------RuntimeWarning: divide by zero encountered in log ll_other = np.sum(np.log(self.pi3 * self._compute_poisson_prob(y[(y != 0) & (y != self.k_inflated)],
         
         return ll_0 + ll_k + ll_other
     
@@ -195,7 +197,7 @@ class ZKIP_EM:
         #if not np.all(X[:, 0] == 1):
         #    X = np.column_stack([np.ones(X.shape[0]), X])
         
-        lambd = np.exp(X @ self.beta)
+        lambd = np.exp(X @ self.beta) #<------------------------------RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ self.beta)
         return self.k_inflated * self.pi2 + self.pi3 * lambd
     
     def predict_mode(self, X):

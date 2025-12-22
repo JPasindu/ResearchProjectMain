@@ -1,0 +1,80 @@
+1. Fitting ZkICMP model...
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\ZkICMP.py:66: RuntimeWarning: overflow encountered in exp
+  Z = np.exp(a_max) * np.sum(np.exp(a - a_max))
+
+2. Fitting ZKINB model...
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\HurdlePoisson.py:30: RuntimeWarning: invalid value encountered in log
+  - np.log(1 - np.exp(log_p0) - np.exp(log_pk))
+
+3. Fitting ZkICMP model...
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\ZkICMP.py:66: RuntimeWarning: overflow encountered in exp
+  Z = np.exp(a_max) * np.sum(np.exp(a - a_max))
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\ZkICMP.py:88: RuntimeWarning: overflow encountered in exp
+  lambdas = np.exp(X.dot(beta))
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\ZkICMP.py:59: RuntimeWarning: invalid value encountered in scalar subtract
+  if np.exp(log_term - max(terms)) < self.tol:
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\ZkICMP.py:66: RuntimeWarning: invalid value encountered in subtract
+  Z = np.exp(a_max) * np.sum(np.exp(a - a_max))
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\ZkICMP.py:74: RuntimeWarning: invalid value encountered in scalar multiply
+  return y * np.log(lambda_) - nu * lgamma(y + 1) - logZ
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\ZkICMP.py:87: RuntimeWarning: overflow encountered in exp
+  nu = np.exp(eta)
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\ZkICMP.py:58: RuntimeWarning: invalid value encountered in scalar subtract
+  log_term = j * log_lambda - nu * lgamma(j + 1)
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\ZkICMP.py:74: RuntimeWarning: invalid value encountered in scalar subtract
+  return y * np.log(lambda_) - nu * lgamma(y + 1) - logZ
+
+5. Fitting ZKINB model...
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:607: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals
+  warnings.warn("Maximum Likelihood optimization failed to "
+c:\Users\STD_IndTrainee3\Documents\GitHub\ResearchProjectMain\Final Simulation\models\HurdlePoisson.py:30: RuntimeWarning: invalid value encountered in log
+  - np.log(1 - np.exp(log_p0) - np.exp(log_pk))
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2748: UserWarning: df_model + k_constant + k_extra differs from k_params
+  warnings.warn("df_model + k_constant + k_extra "
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2752: UserWarning: df_resid differs from nobs - k_params
+  warnings.warn("df_resid differs from nobs - k_params")
+
+
+
+
+
+------------
+Fitting ZKINB model...
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2748: UserWarning: df_model + k_constant + k_extra differs from k_params
+  warnings.warn("df_model + k_constant + k_extra "
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2752: UserWarning: df_resid differs from nobs - k_params
+  warnings.warn("df_resid differs from nobs - k_params")
+
+Fitting ZKINB model...
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\discrete\discrete_model.py:3027: RuntimeWarning: overflow encountered in exp
+  eXB = np.column_stack((np.ones(len(X)), np.exp(X)))
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\discrete\discrete_model.py:3028: RuntimeWarning: invalid value encountered in divide
+  return eXB/eXB.sum(1)[:,None]
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2748: UserWarning: df_model + k_constant + k_extra differs from k_params
+  warnings.warn("df_model + k_constant + k_extra "
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2752: UserWarning: df_resid differs from nobs - k_params
+  warnings.warn("df_resid differs from nobs - k_params")
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2748: UserWarning: df_model + k_constant + k_extra differs from k_params
+  warnings.warn("df_model + k_constant + k_extra "
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2752: UserWarning: df_resid differs from nobs - k_params
+  warnings.warn("df_resid differs from nobs - k_params")
+
+Fitting ZKINB model...
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:595: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  warnings.warn('Inverting hessian failed, no bse or cov_params '
+
+Fitting ZKINB model...
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2748: UserWarning: df_model + k_constant + k_extra differs from k_params
+  warnings.warn("df_model + k_constant + k_extra "
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2752: UserWarning: df_resid differs from nobs - k_params
+  warnings.warn("df_resid differs from nobs - k_params")
+
+Fitting ZKINB model...
+Output is truncated. View as a scrollable element or open in a text editor. Adjust cell output settings...
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:607: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals
+  warnings.warn("Maximum Likelihood optimization failed to "
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2748: UserWarning: df_model + k_constant + k_extra differs from k_params
+  warnings.warn("df_model + k_constant + k_extra "
+c:\Users\STD_IndTrainee3\AppData\Local\Programs\Python\Python312\Lib\site-packages\statsmodels\base\model.py:2752: UserWarning: df_resid differs from nobs - k_params
+  warnings.warn("df_resid differs from nobs - k_params")
+

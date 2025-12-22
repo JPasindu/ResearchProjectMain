@@ -55,15 +55,15 @@ class ZkICMP:
         
         while j < self.max_iter:
             j += 1
-            log_term = j * log_lambda - nu * lgamma(j + 1)
-            if np.exp(log_term - max(terms)) < self.tol:
+            log_term = j * log_lambda - nu * lgamma(j + 1) #------------RuntimeWarning: invalid value encountered in scalar subtract log_term = j * log_lambda - nu * lgamma(j + 1)
+            if np.exp(log_term - max(terms)) < self.tol: #--------------RuntimeWarning: invalid value encountered in scalar subtract if np.exp(log_term - max(terms)) < self.tol:
                 terms.append(log_term)
                 break
             terms.append(log_term)
         
         a = np.array(terms)
         a_max = a.max()
-        Z = np.exp(a_max) * np.sum(np.exp(a - a_max))
+        Z = np.exp(a_max) * np.sum(np.exp(a - a_max)) #----------------RuntimeWarning: invalid value encountered in subtract Z = np.exp(a_max) * np.sum(np.exp(a - a_max))
         return Z
     
     def _log_cmp_pmf(self, y, lambda_, nu):
@@ -71,7 +71,7 @@ class ZkICMP:
         if lambda_ <= 0:
             return -np.inf if y > 0 else 0.0
         logZ = np.log(self._cmp_Z(lambda_, nu))
-        return y * np.log(lambda_) - nu * lgamma(y + 1) - logZ
+        return y * np.log(lambda_) - nu * lgamma(y + 1) - logZ #---------RuntimeWarning: invalid value encountered in scalar multiply return y * np.log(lambda_) - nu * lgamma(y + 1) - logZ
     
     def _cmp_pmf(self, y, lambda_, nu):
         """PMF for CMP distribution"""
@@ -84,8 +84,8 @@ class ZkICMP:
         gamma = params[p]
         delta = params[p + 1]
         eta = params[p + 2]
-        nu = np.exp(eta)
-        lambdas = np.exp(X.dot(beta))
+        nu = np.exp(eta) #----------------------------------RuntimeWarning: overflow encountered in exp nu = np.exp(eta)
+        lambdas = np.exp(X.dot(beta)) #---------------------RuntimeWarning: overflow encountered in exp lambdas = np.exp(X.dot(beta))
         
         eg = np.exp(gamma)
         ed = np.exp(delta)

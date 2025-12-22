@@ -23,13 +23,18 @@ class ZeroKTruncatedPoisson(GenericLikelihoodModel):
         
         # Log-likelihood for {0,k}-truncated Poisson
         # = log(Poisson) - log(1 - P(0) - P(k))
+
+        eps = 1e-12
+        Z = 1 - np.exp(log_p0) - np.exp(log_pk)
+        Z = np.clip(Z, eps, None)
+
         ll = (
             y * np.log(mu)
             - mu
             - gammaln(y + 1)
-            - np.log(1 - np.exp(log_p0) - np.exp(log_pk))
+            - np.log(Z)
         )
-        
+
         return -ll
 
 
