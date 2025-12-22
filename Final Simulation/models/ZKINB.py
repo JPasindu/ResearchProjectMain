@@ -52,16 +52,26 @@ class ZkINB_EM:
         # gammaln(y + r) - gammaln(r) - gammaln(y+1) + r*log(p) + y*log(1-p)
         return gammaln(y + r) - gammaln(r) - gammaln(y + 1) + r * np.log(np.maximum(p, eps)) + y * np.log(np.maximum(1 - p, eps))
 
-    def _softmax_three(self, a, b):
-        """
-        softmax for triplet [a, b, 0] returning (phi, psi, pnb)
-        returns arrays of same shape
-        """
-        # stack and use logsumexp for numerical stability
-        S = np.vstack([a, b, np.zeros_like(a)])  # shape (3, n)
-        lse = logsumexp(S, axis=0)
-        probs = np.exp(S - lse)
-        return probs[0, :], probs[1, :], probs[2, :]  # phi, psi, pnb
+    def _softmax_three(self, eta0, etak):
+        # stack logits: [0, eta0, etak]
+        logits = np.vstack([np.zeros_like(eta0), eta0, etak])
+        lse = logsumexp(logits, axis=0)
+
+        log_phi = eta0 - lse
+        log_psi = etak - lse
+        log_pnb = -lse
+
+        phi = np.exp(log_phi)
+        psi = np.exp(log_psi)
+        pnb = np.exp(log_pnb)
+
+        # clipping to avoid warnings
+        eps = 1e-12
+        return (
+            np.clip(phi, eps, 1 - eps),
+            np.clip(psi, eps, 1 - eps),
+            np.clip(pnb, eps, 1 - eps),
+        )
 
     # --------- prediction helpers ----------
     def predict_infl(self, X_infl):
@@ -135,7 +145,10 @@ class ZkINB_EM:
             eta0 = X_infl @ self.gamma0
             etak = X_infl @ self.gammak
             phi, psi, pnb = self._softmax_three(eta0, etak)
-            mu = np.exp(X_count @ self.beta)
+            # clipping to avoid warnings
+            eta = X_count @ self.beta
+            eta = np.clip(eta, -20, 20)
+            mu = np.exp(eta)
 
             nb_logpmf = self._nb_logpmf_vec(y, mu, self.alpha)
             nb_p = np.exp(nb_logpmf)
@@ -207,7 +220,11 @@ class ZkINB_EM:
                 beta = params[:p_count]
                 log_alpha = params[-1]
                 alpha = np.exp(log_alpha)
-                mu_i = np.exp(X_count @ beta)
+                # clipping to avoid warnings
+                eta = X_count @ beta
+                eta = np.clip(eta, -20, 20)
+                mu_i = np.exp(eta)
+
                 lp = self._nb_logpmf_vec(y, mu_i, alpha)
                 return -np.sum(Wnb * lp)
 
@@ -215,7 +232,7 @@ class ZkINB_EM:
             log_alpha0 = np.log(max(self.alpha, 1e-8))
             beta0 = self.beta.copy()
             x0 = np.concatenate([beta0, [log_alpha0]])
-            bnds = [(None, None)] * p_count + [(np.log(1e-8), np.log(1e8))]
+            bnds = [(-5, 5)] * p_count + [(-10, 3)]
             res_nb = minimize(weighted_nb_negloglik, x0, method="L-BFGS-B", bounds=bnds,
                               options={"ftol":1e-9, "gtol":1e-6, "maxiter":200})
             if res_nb.success:
@@ -259,7 +276,7 @@ class ZkINB_EM:
                         print(f"Converged at iter {it} (rel change {rel:.2e})")
                     break
             prev_ll = ll
-
+        
         result = {
             "n_iter": it,
             "converged": (it < max_iter or (it == max_iter and rel < tol)),
@@ -275,21 +292,35 @@ class ZkINB_EM:
 
     # --------- convenience functions ---------
     def pmf_given_X(self, y, X_infl, X_count):
-        """Return pmf_i for each observation given design matrices and current params."""
         eta0 = X_infl @ self.gamma0
         etak = X_infl @ self.gammak
         phi, psi, pnb = self._softmax_three(eta0, etak)
-        mu = np.exp(X_count @ self.beta)
-        nb_logpmf = self._nb_logpmf_vec(y, mu, self.alpha)
-        nb_p = np.exp(nb_logpmf)
-        pmf = np.zeros_like(y, dtype=float)
+
+        eta = np.clip(X_count @ self.beta, -20, 20)
+        mu = np.exp(eta)
+
+        log_nb = self._nb_logpmf_vec(y, mu, self.alpha)
+
+        log_phi = np.log(phi)
+        log_psi = np.log(psi)
+        log_pnb = np.log(pnb)
+
+        out = np.zeros_like(y, dtype=float)
+
         mask0 = (y == 0)
         maskk = (y == self.k)
-        mask_other = ~(mask0 | maskk)
-        pmf[mask0] = phi[mask0] + (1 - phi[mask0] - psi[mask0]) * nb_p[mask0]
-        pmf[maskk] = psi[maskk] + (1 - phi[maskk] - psi[maskk]) * nb_p[maskk]
-        pmf[mask_other] = (1 - phi[mask_other] - psi[mask_other]) * nb_p[mask_other]
-        return np.maximum(pmf, 1e-300)
+        masko = ~(mask0 | maskk)
+
+        out[mask0] = np.exp(
+            logsumexp([log_phi[mask0], log_pnb[mask0] + log_nb[mask0]], axis=0)
+        )
+        out[maskk] = np.exp(
+            logsumexp([log_psi[maskk], log_pnb[maskk] + log_nb[maskk]], axis=0)
+        )
+        out[masko] = np.exp(log_pnb[masko] + log_nb[masko])
+
+        return np.clip(out, 1e-300, None)
+
 
     def predict_infl_probs(self, X_infl):
         return self.predict_infl(X_infl)  # phi, psi, pnb

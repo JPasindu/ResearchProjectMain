@@ -24,7 +24,9 @@ class ZKIP_EM:
     def _e_step(self, y, X, beta, gamma, delta):
         """E-step: Compute expected values of latent variables"""
         n = len(y)
-        lambd = np.exp(X @ beta) #<--------------- RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ beta)
+        eta = X @ beta
+        eta = np.clip(eta, -20, 20)
+        lambd = np.exp(eta) #<--------------- RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ beta)
         
         p0 = self._compute_poisson_prob(0, lambd)
         pk = self._compute_poisson_prob(self.k_inflated, lambd)
@@ -71,7 +73,9 @@ class ZKIP_EM:
         
         # Update beta using weighted Poisson regression
         def neg_log_likelihood_beta(beta):
-            lambd = np.exp(X @ beta) #<------------------------------------ RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ beta)
+            eta = X @ beta
+            eta = np.clip(eta, -20, 20)
+            lambd = np.exp(eta) #<------------------------------------ RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ beta)
             return -np.sum(z3_hat * (y * np.log(lambd) - lambd)) #<-------- RuntimeWarning: divide by zero encountered in log return -np.sum(z3_hat * (y * np.log(lambd) - lambd))
 
         
@@ -145,7 +149,9 @@ class ZKIP_EM:
         if not hasattr(self, 'beta'):
             return -np.inf
 
-        lambd = np.exp(X @ self.beta) #<---------------- RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ self.beta)
+        eta = X @ self.beta
+        eta = np.clip(eta, -20, 20)
+        lambd = np.exp(eta) #<---------------- RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ self.beta)
 
         p0 = self._compute_poisson_prob(0, lambd)
         pk = self._compute_poisson_prob(self.k_inflated, lambd)
@@ -197,7 +203,9 @@ class ZKIP_EM:
         #if not np.all(X[:, 0] == 1):
         #    X = np.column_stack([np.ones(X.shape[0]), X])
         
-        lambd = np.exp(X @ self.beta) #<------------------------------RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ self.beta)
+        eta = X @ self.beta
+        eta = np.clip(eta, -20, 20)
+        lambd = np.exp(eta)#<------------------------------RuntimeWarning: overflow encountered in exp lambd = np.exp(X @ self.beta)
         return self.k_inflated * self.pi2 + self.pi3 * lambd
     
     def predict_mode(self, X):
