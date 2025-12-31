@@ -60,4 +60,29 @@ class ZKHurdlePoisson:
 
         return self.k * pk + po * mu
 
-    
+    # --------------------------------------------------
+    # Log-likelihood (FULL, CORRECT)
+    # --------------------------------------------------
+    def loglikelihood(self, X, y):
+        y = np.asarray(y)
+        p0, pk, po = self.predict_probs(X)
+        mu = np.exp(X @ self.poisson_model.params)
+
+        ll = np.zeros_like(y, dtype=float)
+
+        mask0 = (y == 0)
+        maskk = (y == self.k)
+        masko = ~(mask0 | maskk)
+
+        ll[mask0] = np.log(p0[mask0])
+        ll[maskk] = np.log(pk[maskk])
+
+        ll[masko] = (
+            np.log(po[masko])
+            + y[masko] * np.log(mu[masko])
+            - mu[masko]
+            - gammaln(y[masko] + 1)
+        )
+
+        return ll.sum()
+

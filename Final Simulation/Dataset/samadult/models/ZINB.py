@@ -12,6 +12,7 @@ def nb_irls(X, y, w, alpha, max_iter=50):
 
     for _ in range(max_iter):
         eta = X @ beta
+        eta = np.clip(eta, -20, 20)
         mu = np.exp(eta)
 
         # Variance: mu + alpha*mu^2
@@ -38,6 +39,7 @@ def logit_irls(X, y, w, max_iter=50):
 
     for _ in range(max_iter):
         eta = X @ gamma
+        eta = np.clip(eta, -20, 20)
         p = expit(eta)
 
         z = eta + (y - p) / (p * (1 - p))
