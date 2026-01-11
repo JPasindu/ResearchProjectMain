@@ -57,7 +57,7 @@ class ZKHurdlePoisson:
     def predict_mean(self, X):
         p0, pk, po = self.predict_probs(X)
         mu = np.exp(X @ self.poisson_model.params)
-
+        
         return self.k * pk + po * mu
 
     # --------------------------------------------------
